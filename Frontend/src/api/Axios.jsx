@@ -19,6 +19,10 @@ export const POST = async (url,data,loading) => {
     if (error.response && error.response.data.message) {
       error.message = error.response.data.message;
     }
+    console.log(error.message.includes("Network Error"))
+    if(error.message.includes("Network Error")){
+      error.message="Erreur réseau";
+    }
     toast.error(error.message);
     loading(false);
   }

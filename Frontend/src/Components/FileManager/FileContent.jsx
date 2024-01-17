@@ -105,7 +105,7 @@ function App() {
     
     const handleUpload = async () => {
       setUploading(true)
-      const response = await POSTFILE('/file',file,setUploading);
+      const response = await POSTFILE('/file',{...file,name:file.file.name},setUploading);
       if(response){
         toast.success(response.data.message);
         setFile({
@@ -143,8 +143,35 @@ function App() {
     }
   }
 
-  const handleDownloadFile = (file) => {
-    window.location.href = file.path.url;
+  // const handleDownloadFile = (file) => {
+  //   window.location.href = file.path.url;
+  // };
+  const handleDownloadFile = async (file) => {
+    try {
+      const fileUrl = file.path.url;
+  
+      const response = await fetch(fileUrl);
+      const blob = await response.blob();
+  
+      // Determine the file type based on the file name or other information
+      const contentType = response.headers.get('Content-Type') || 'application/octet-stream';
+  
+      // Create a download link
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(new Blob([blob], { type: contentType }));
+      link.download = file.name;
+  
+      // Append the link to the body
+      document.body.appendChild(link);
+  
+      // Trigger a click event on the link
+      link.click();
+  
+      // Remove the link from the body
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
   };
   
   const handleDelete = async () => {
@@ -186,14 +213,6 @@ function App() {
                   <Modal.Title>Télécharger un fichier</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                  <input
-                    type="text"
-                    value={file.name}
-                    onChange={(e) => setFile({...file,name:e.target.value})}
-                    placeholder="Entrez le nom du fichier"
-                    style={{ width: '100%', padding: '0.5rem', borderRadius: '5px', marginBottom: '1rem' }}
-                    className='form-control'
-                  />
                   <label htmlFor="fileInput" style={{ cursor: 'pointer',border:'1px solid #dee2e6',width:'100%',height:'40px',borderRadius:'5px',padding:'7px' }}>
                     {/* Custom text for the file input */}
                     Choisir le fichier: {file.file ? file.file.name : 'Aucun fichier choisi'}
@@ -281,7 +300,7 @@ function App() {
           }
           {Array.isArray(fileList) && fileList.map(file => (
         <div key={file._id} className='col-md-2 col-sm-6 col-6 mt-2'>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center',border:'1px solid rgba(0, 0, 0, 0.175)',borderRadius:'5px',}}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center',border:'1px solid rgba(0, 0, 0, 0.175)',borderRadius:'5px',cursor:'pointer'}} onClick={()=>handleDownloadFile(file)}>
               <div style={{paddingTop:'18px',paddingBottom:'5px'}}>
                 <div >
                   {getFileIcon(file)}

@@ -44,8 +44,7 @@ export const createFile= async (req, res)=>{
         const existingFile = await Files.findOne({
             name,
             $and: [
-              { folder_id: { $ne: files.folder_id } },
-              { folder_id: { $ne: null } },
+              { folder_id: { $eq: files.folder_id } },
             ],
           });
           
@@ -134,6 +133,8 @@ export const UpdateFiles=async(req, res)=>{
             _id:{$ne:id},
             name:file?.name
         });
+
+        
         if (existingFile)
             return res.status(400).json({ message:'Le fichier existe déjà...'});
 

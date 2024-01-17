@@ -34,7 +34,6 @@ const updateUserSchema = Joi.object({
     address: Joi.string().allow(null),
     role:Joi.string().required(),
     job_designation:Joi.string().allow(null),
-    zip: Joi.string().allow(null).optional(),
    
 }).unknown();
 
